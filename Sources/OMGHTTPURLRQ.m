@@ -7,6 +7,7 @@
 #import "OMGUserAgent.h"
 #import "OMGFormURLEncode.h"
 #import <stdlib.h>
+#import <FounDation/NSArray.h>
 
 static inline NSMutableURLRequest *OMGMutableURLRequest() {
     NSMutableURLRequest *rq = [NSMutableURLRequest new];
@@ -47,7 +48,7 @@ static inline NSMutableURLRequest *OMGMutableURLRequest() {
     [body appendData:[ln1 dataUsingEncoding:NSUTF8StringEncoding]];
     [body appendData:[ln2 dataUsingEncoding:NSUTF8StringEncoding]];
     [body appendData:payload];
-    [body appendData:[@"\r\n" dataUsingEncoding:NSUTF8StringEncoding]];
+//    [body appendData:[@"\r\n" dataUsingEncoding:NSUTF8StringEncoding]];
 }
 
 - (void)addFile:(NSData *)payload parameterName:(NSString *)name filename:(NSString *)filename contentType:(NSString *)contentType
@@ -60,8 +61,15 @@ static inline NSMutableURLRequest *OMGMutableURLRequest() {
 }
 
 - (void)addParameters:(NSDictionary *)parameters {
-    for (id key in parameters)
-        [self addText:[parameters[key] description] parameterName:key];
+    NSArray *keys = parameters.allKeys;
+    for (int i = 0; i< keys.count; i++) {
+        NSString *key = keys[i];
+        NSMutableString *text = [NSMutableString stringWithString:[parameters[key] description]];
+        if (![key isEqual:[keys lastObject]]) {
+            [text appendString:@"\r\n"];
+        }
+        [self addText:text parameterName:key];
+    }
 }
 
 @end
